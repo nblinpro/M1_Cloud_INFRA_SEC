@@ -1,1 +1,66 @@
-Coucou
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio – Projets</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Lien vers le fichier CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Mon Portfolio</div>
+    <nav>
+        <ul>
+            <li><a href="#projets">Projets</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main>
+    <!-- Section d’accueil -->
+    <section class="hero">
+        <h1>Bienvenue</h1>
+        <p>Ce site présente des projets académiques et en entreprise.</p>
+    </section>
+
+    <!-- Section projets -->
+    <section id="projets">
+        <h2>Mes projets</h2>
+
+        <div class="grid">
+            <!-- Carte OpenStack -->
+            <div class="card">
+                <h3>Projet OpenStack</h3>
+                <p>
+                    Mise en place et administration d’une infrastructure cloud
+                    basée sur OpenStack (réseau, instances, sécurité).
+                </p>
+                <a class="btn" href="Openstack/" target="_blank">
+                    Accéder au projet
+                </a>
+            </div>
+
+            <!-- Carte Ansible -->
+            <div class="card">
+                <h3>Projet Ansible</h3>
+                <p>
+                    Déploiement automatisé d’une application Laravel
+                    avec Ansible (Web, Base de données, Firewall, SELinux).
+                </p>
+                <a class="btn" href="projet_ansible/" target="_blank">
+                    Accéder au projet
+                </a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer id="contact">
+    <p>© 2025 – Portfolio | Projets académiques & professionnels</p>
+</footer>
+
+</body>
+</html>
