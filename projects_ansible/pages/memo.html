@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Mémo Linux - Infra</title>
+    <title>Mémo Lab Ansible - Infra</title>
     <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
@@ -20,50 +20,111 @@
     </header>
 
     <main>
-        <h1>Aide-mémoire Système & Réseau</h1>
+        <h1>Fiche Mémo : Lab Ansible (Ubuntu & RHEL9)</h1>
+        <p>Procédure de mise en place de l'environnement : Contrôleur Ubuntu et Cibles RedHat Enterprise Linux 9.</p>
 
         <section>
-            <h2>Gestion des processus</h2>
+            <h2>1. Préparation du Contrôleur (Ubuntu)</h2>
+
+            <h3>A. Configuration IP statique (Netplan)</h3>
+            <p>Éditer le fichier <code>/etc/netplan/50-cloud-init.yaml</code> :</p>
             <pre>
-# Voir les processus gourmands
-htop
+network:
+  version: 2
+  ethernets:
+    ens33:
+      dhcp4: false
+      addresses:
+        - 192.168.80.$/24 # Remplacer $ par votre IP
+      routes:
+        - to: default
+          via: 192.168.80.2
+      nameservers:
+        addresses:
+          - 8.8.8.8
+          - 1.1.1.1
+</pre>
+            <p>Appliquer la configuration :</p>
+            <pre>sudo netplan apply</pre>
 
-# Tuer un processus par son nom
-pkill -f nom_processus
+            <h3>B. Installation Ansible</h3>
+            <pre>
+sudo apt update
+sudo apt install ansible ansible-core -y
+</pre>
 
-# Voir les ports ouverts
-ss -tulpn
+            <h3>C. Génération clé SSH</h3>
+            <pre>
+ssh-keygen -t rsa -b 4096
+# Laisser les options par défaut (entrée, entrée, entrée)
+# Fichier créé : ~/.ssh/id_rsa
 </pre>
         </section>
 
-        <section>
-            <h2>Gestion des Archives</h2>
-            <pre>
-# Compresser un dossier en tar.gz
-tar -czvf archive.tar.gz dossier/
+        <hr style="border-color: var(--secondary); margin: 3rem 0;">
 
-# Décompresser
-tar -xzvf archive.tar.gz
+        <section>
+            <h2>2. Préparation des serveurs RHEL 9</h2>
+
+            <h3>A. Configuration IP statique</h3>
+            <p>Modification via NetworkManager dans <code>/etc/NetworkManager/system-connections/ens160.nmconnection</code> (ou via nmtui) :</p>
+            <pre>
+[ipv4]
+method=manual
+address1=192.168.80.$/24
+gateway=192.168.80.2
+dns=8.8.8.8;1.1.1.1;
+</pre>
+            <p>Rechargement de l'interface :</p>
+            <pre>
+sudo nmcli connection reload
+sudo nmcli connection up ens160
+</pre>
+
+            <h3>B. Système & Abonnement</h3>
+            <pre>
+# Enregistrement RedHat (Credentials requis)
+sudo subscription-manager register
+
+# Activation des dépôts
+sudo subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms
+sudo subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms
+
+# Mise à jour système
+sudo dnf update -y
+</pre>
+
+            <h3>C. Hostname & Sudo</h3>
+            <pre>
+# Définir le nom de la machine
+sudo hostnamectl set-hostname web2laravel
+</pre>
+            <p>Configuration des droits sudo sans mot de passe (<code>sudo visudo</code>) :</p>
+            <pre>
+innosys ALL=(ALL) NOPASSWD: ALL
 </pre>
         </section>
 
+        <hr style="border-color: var(--secondary); margin: 3rem 0;">
+
         <section>
-            <h2>Docker Quick Tips</h2>
-            <pre>
-# Nettoyer les ressources inutilisées
-docker system prune -a
+            <h2>3. Finalisation depuis le contrôleur</h2>
+            
+            <h3>Propagation clé SSH</h3>
+            <p>Envoie de la clé publique vers la machine cible pour connexion sans mot de passe :</p>
+            <pre>ssh-copy-id innosys@192.168.80.$</pre>
 
-# Voir les logs en direct
-docker logs -f id_conteneur
-
-# Exécuter un shell dans un conteneur
-docker exec -it id_conteneur /bin/bash
-</pre>
+            <h3>Test connexion</h3>
+            <pre>ssh innosys@192.168.80.$</pre>
+            <p><em>Si aucune demande de mot de passe n’apparaît, la configuration est valide.</em></p>
         </section>
+
     </main>
 
     <footer>
-        <p><a href="../index.html">← Retour à l'accueil</a></p>
+        <p>Projet Ansible – Mastère Cloud, Infrastructure et Sécurité | Innosys – 2025</p>
+        <p style="margin-top: 10px;"><a href="../projets_ansible.html">← Retour au projet</a></p>
     </footer>
+
 </body>
 </html>
